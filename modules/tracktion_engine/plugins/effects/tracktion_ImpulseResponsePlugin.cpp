@@ -16,6 +16,9 @@ namespace tracktion_engine
 ImpulseResponsePlugin::ImpulseResponsePlugin (PluginCreationInfo info)
     : Plugin (info)
 {
+    processorChain.setBypassed<HPFIndex> (true);
+    processorChain.setBypassed<LPFIndex> (true);
+
     auto um = getUndoManager();
 
     name.referTo (state, IDs::name, um);
