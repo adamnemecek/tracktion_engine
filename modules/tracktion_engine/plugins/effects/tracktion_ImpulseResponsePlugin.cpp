@@ -16,8 +16,8 @@ namespace tracktion_engine
 ImpulseResponsePlugin::ImpulseResponsePlugin (PluginCreationInfo info)
     : Plugin (info)
 {
-    processorChain.setBypassed<HPFIndex> (true);
-    processorChain.setBypassed<LPFIndex> (true);
+ //   processorChain.setBypassed<HPFIndex> (true);
+ //   processorChain.setBypassed<LPFIndex> (true);
 
     auto um = getUndoManager();
 
@@ -160,7 +160,7 @@ void ImpulseResponsePlugin::initialise (const PluginInitialisationInfo& info)
     wetGainSmoother.setTargetValue (wetDry.wet);
     dryGainSmoother.setTargetValue (wetDry.dry);
     
-    const double smoothTime = 0.01;
+    const double smoothTime = 0.5;//0.01;
     lowFreqSmoother.reset (info.sampleRate, smoothTime);
     highFreqSmoother.reset (info.sampleRate, smoothTime);
     gainSmoother.reset (info.sampleRate, smoothTime);
@@ -198,7 +198,7 @@ void ImpulseResponsePlugin::applyToBuffer (const PluginRenderContext& fc)
     
     if (gainSmoother.isSmoothing() || lowFreqSmoother.isSmoothing() || highFreqSmoother.isSmoothing() || qSmoother.isSmoothing())
     {
-        const int blockSize = 32;
+        const int blockSize = 8;
         int numSamplesLeft = fc.bufferNumSamples;
         int numSamplesDone = 0;
         
