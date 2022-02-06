@@ -513,13 +513,13 @@ bool RackType::addPlugin (const Plugin::Ptr& p, juce::Point<float> pos, bool can
             for (int i = 0; i < ins.size(); ++i)   addConnection ({}, i + 1, p->itemID, i + 1);
             for (int i = 0; i < outs.size(); ++i)  addConnection (p->itemID, i + 1, {}, i + 1);
 
-            // midi connections
+                // midi connections
             addConnection ({}, 0, p->itemID, 0);
             addConnection (p->itemID, 0, {}, 0);
+            
+            return true;
         }
-
-        return true;
-    }
+    } 
 
     return false;
 }
