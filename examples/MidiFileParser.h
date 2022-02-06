@@ -31,6 +31,49 @@
 #include "common/BinaryData.h"
 #include "common/BinaryData.cpp"
 
+namespace te = tracktion_engine;
+
+te::AudioTrack::Ptr insertTrack(te::Edit &edit, int index) {
+    // auto count = edit.getAudioTracks().size();
+    edit.ensureNumberOfAudioTracks(index + 1);
+    return te::getAudioTracks(edit)[index];
+    // auto tracks = edit.getAudioTracks();
+    // return tracks;
+}
+
+void parsefile(juce::String &path) {
+
+    // te::Edit edit;
+    // te::Engine{ "ngrid", std::make_unique<ExtendedUIBehaviour>(), nullptr };
+    te::Engine engine { "midifileparser" };
+    te::Edit edit {
+        engine,
+        te::createEmptyEdit(engine),
+        te::Edit::forEditing,
+        nullptr,
+        0
+    };
+
+    juce::FileInputStream f(path);
+    if (!f.openedOk()) {
+        assert(false);
+    }
+
+    juce::MidiFile mf;
+    mf.readFrom(f);
+
+    auto len = mf.getNumTracks();
+    for (auto i = 0; i < len; i++) {
+        auto midiTrack = mf.getTrack(i);
+
+        auto track = insertTrack(edit, i);
+
+
+        // auto seq = track->getNotes();
+        // tra
+    }
+}
+
 //==============================================================================
 namespace
 {
@@ -461,7 +504,7 @@ public:
 
     //==============================================================================
     void sliderValueChanged (Slider*) override
-    {        
+    {
         if (! ModifierKeys::getCurrentModifiers().isAnyMouseButtonDown())
             edit.tempoSequence.getTempos()[0]->setBpm (tempoSlider.getValue());
     }
