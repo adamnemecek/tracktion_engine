@@ -62,12 +62,18 @@ void parsefile(juce::String &path) {
     juce::MidiFile mf;
     mf.readFrom(f);
 
+    auto maxLen = te::Edit::maximumLength;
     auto len = mf.getNumTracks();
+
+    te::EditTimeRange range { 0, maxLen };
+
     for (auto i = 0; i < len; i++) {
         auto midiTrack = mf.getTrack(i);
 
         auto track = insertTrack(edit, i);
-
+        auto clip = track->insertMIDIClip(range, {});
+        // const juce::MidiMessageSequence & seq = *midiTrack;
+        // clip->mergeInMidiSequence(seq, te::MidiList::NoteAutomationType::none);
 
         // auto seq = track->getNotes();
         // tra
