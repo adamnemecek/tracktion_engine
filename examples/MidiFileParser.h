@@ -34,17 +34,16 @@
 namespace te = tracktion_engine;
 
 te::AudioTrack::Ptr insertTrack(te::Edit &edit, int index) {
-    // auto count = edit.getAudioTracks().size();
     edit.ensureNumberOfAudioTracks(index + 1);
     return te::getAudioTracks(edit)[index];
-    // auto tracks = edit.getAudioTracks();
-    // return tracks;
+}
+
+void merge(te::MidiClip::Ptr &clip, juce::MidiMessageSequence &seq) {
+    clip->mergeInMidiSequence(seq, te::MidiList::NoteAutomationType::none);
 }
 
 void parsefile(juce::String &path) {
 
-    // te::Edit edit;
-    // te::Engine{ "ngrid", std::make_unique<ExtendedUIBehaviour>(), nullptr };
     te::Engine engine { "midifileparser" };
     te::Edit edit {
         engine,
@@ -62,7 +61,7 @@ void parsefile(juce::String &path) {
     juce::MidiFile mf;
     mf.readFrom(f);
 
-    auto maxLen = te::Edit::maximumLength;
+    auto maxLen = te::Edit::maximumLength - 1;
     auto len = mf.getNumTracks();
 
     te::EditTimeRange range { 0, maxLen };
@@ -70,13 +69,18 @@ void parsefile(juce::String &path) {
     for (auto i = 0; i < len; i++) {
         auto midiTrack = mf.getTrack(i);
 
+        auto trackCopy = juce::MidiMessageSequence(*midiTrack);
+
         auto track = insertTrack(edit, i);
         auto clip = track->insertMIDIClip(range, {});
-        // const juce::MidiMessageSequence & seq = *midiTrack;
-        // clip->mergeInMidiSequence(seq, te::MidiList::NoteAutomationType::none);
 
-        // auto seq = track->getNotes();
-        // tra
+        clip->mergeInMidiSequence(trackCopy, te::MidiList::NoteAutomationType::none);
+
+        auto notes = clip->getSequence().getNotes();
+
+        for (auto note: notes) {
+            printf("ticks %f\n", note->getBeatPosition());
+        }
     }
 }
 
@@ -109,6 +113,8 @@ struct StepEditor   : public Component,
     StepEditor (te::StepClip& sc)
         : clip (sc), transport (sc.edit.getTransport())
     {
+        juce::String path("../../../../../darude.pattern.mid");
+        parsefile(path);
         for (auto c : clip.getChannels())
             addAndMakeVisible (channelConfigs.add (new ChannelConfig (*this, c->getIndex())));
 
